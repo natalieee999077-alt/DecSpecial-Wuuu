@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pixel Gift</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --skyTop:#0b1230;
+      --skyMid:#070a18;
+      --text:#e6f1ff;
+      --muted:#a9b8d6;
+
+      --panel: rgba(15,23,42,.86);
+      --border: rgba(230,241,255,.18);
+
+      --headline:#ffe58a;
+      --headlineStroke: rgba(0,0,0,.65);
+      --headlineGlow: rgba(255,229,138,.20);
+
+      --tree1:#061026;
+      --tree2:#070f24;
+
+      --btnRed1:#c41e3a;
+      --btnRed2:#a4162f;
+      --btnGreen:#2f7d32;
+
+      --cardRadius:18px;
+    }
+
+    *{ box-sizing:border-box; font-family:"Press Start 2P", monospace; }
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255,229,138,.10) 0%, rgba(0,0,0,0) 36%),
+        radial-gradient(circle at 78% 16%, rgba(147,197,253,.10) 0%, rgba(0,0,0,0) 40%),
+        radial-gradient(circle at 50% 62%, rgba(255,255,255,.05) 0%, rgba(0,0,0,0) 55%),
+        linear-gradient(180deg, var(--skyTop) 0%, var(--skyMid) 70%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* vignette */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    /* sparkles */
+    .sparkles{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:1;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,229,138,.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 22%, rgba(167,243,208,.20) 0 2px, transparent 3px),
+        radial-gradient(circle at 18% 44%, rgba(147,197,253,.18) 0 2px, transparent 3px),
+        radial-gradient(circle at 88% 58%, rgba(255,107,107,.18) 0 2px, transparent 3px),
+        radial-gradient(circle at 10% 76%, rgba(255,229,138,.16) 0 2px, transparent 3px),
+        radial-gradient(circle at 92% 84%, rgba(167,243,208,.14) 0 2px, transparent 3px);
+      opacity:.9;
+    }
+
+    /* dense pixel trees background */
+    .pixel-trees{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.95;
+    }
+    .pixel-trees .far, .pixel-trees .near{
+      position:absolute; left:0; right:0;
+      height:260px;
+      bottom:230px;
+    }
+    .pixel-trees .far{
+      bottom:290px;
+      opacity:.55;
+      filter: blur(.3px);
+    }
+    .pixel-trees .far::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-conic-gradient(from 45deg at 10px 100%, transparent 0 7deg, var(--tree2) 7deg 14deg),
+        repeating-conic-gradient(from 45deg at 30px 100%, transparent 0 7deg, var(--tree2) 7deg 14deg),
+        repeating-conic-gradient(from 45deg at 50px 100%, transparent 0 7deg, var(--tree2) 7deg 14deg),
+        repeating-conic-gradient(from 45deg at 70px 100%, transparent 0 7deg, var(--tree2) 7deg 14deg);
+      background-size: 80px 220px;
+      opacity:.75;
+      mask: linear-gradient(to top, transparent 0%, black 18%, black 100%);
+    }
+    .pixel-trees .near{
+      bottom:230px;
+      opacity:.92;
+    }
+    .pixel-trees .near::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-conic-gradient(from 45deg at 14px 100%, transparent 0 8deg, var(--tree1) 8deg 18deg),
+        repeating-conic-gradient(from 45deg at 34px 100%, transparent 0 8deg, var(--tree1) 8deg 18deg),
+        repeating-conic-gradient(from 45deg at 54px 100%, transparent 0 8deg, var(--tree1) 8deg 18deg),
+        repeating-conic-gradient(from 45deg at 74px 100%, transparent 0 8deg, var(--tree1) 8deg 18deg),
+        repeating-conic-gradient(from 45deg at 24px 100%, transparent 0 9deg, rgb(7,15,36) 9deg 20deg),
+        repeating-conic-gradient(from 45deg at 44px 100%, transparent 0 9deg, rgb(7,15,36) 9deg 20deg),
+        repeating-conic-gradient(from 45deg at 64px 100%, transparent 0 9deg, rgb(7,15,36) 9deg 20deg),
+        repeating-conic-gradient(from 45deg at 84px 100%, transparent 0 9deg, rgb(7,15,36) 9deg 20deg);
+      background-size: 72px 280px;
+      opacity:.92;
+      mask: linear-gradient(to top, transparent 0%, black 12%, black 100%);
+    }
+
+    /* snow ground */
+    .snow-ground{
+      position:fixed; left:0; right:0;
+      bottom:0;
+      height:240px;
+      pointer-events:none;
+      z-index:0;
+      background:
+        linear-gradient(to top, transparent 0%, transparent 35%, rgba(0,0,0,.08) 100%),
+        linear-gradient(180deg, rgba(232,238,247,.92) 0%, rgba(232,238,247,.86) 60%, rgba(232,238,247,.80) 100%);
+      border-top: 4px solid var(--border);
+    }
+    .snow-ground::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 2px, transparent 2px 10px),
+        repeating-linear-gradient(0deg,  rgba(255,255,255,.05) 0 2px, transparent 2px 10px);
+      opacity:.45;
+    }
+
+    /* main layout */
+    .wrap{
+      position:relative;
+      z-index:2;
+      width:min(980px, 92vw);
+      margin:18px auto 120px;
+      padding:8px 0 80px;
+    }
+
+    .big-title{
+      text-align:center;
+      font-size:28px;
+      line-height:1.35;
+      letter-spacing:1px;
+      color:var(--headline);
+      text-shadow:
+        -2px 0 var(--headlineStroke),
+         2px 0 var(--headlineStroke),
+         0 -2px var(--headlineStroke),
+         0  2px var(--headlineStroke),
+         0  0 18px var(--headlineGlow);
+      margin:14px 0 10px;
+    }
+
+    .pixel-card{
+      background: linear-gradient(180deg, rgba(15,23,42,.86), rgba(11,18,38,.86));
+      border:4px solid var(--border);
+      border-radius: var(--cardRadius);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      padding:16px 16px 10px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .pixel-card::before{
+      content:"";
+      position:absolute; inset:0;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,.03), rgba(255,255,255,.03) 2px, transparent 2px, transparent 7px);
+      pointer-events:none;
+      opacity:.55;
+    }
+    .badge{
+      display:inline-block;
+      padding:8px 10px;
+      border:3px solid var(--border);
+      border-radius:12px;
+      background: rgba(0,0,0,.25);
+      color: var(--muted);
+      font-size:12px;
+      position:relative;
+      z-index:2;
+    }
+    .lights{ display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 6px; position:relative; z-index:2; }
+    .bulb{ width:12px;height:12px;border-radius:2px;opacity:.92; animation: twinkle 1.6s infinite steps(2,end); }
+    .b1{ background:#ff6b6b; animation-delay:.0s;}
+    .b2{ background:#ffe58a; animation-delay:.2s;}
+    .b3{ background:#a7f3d0; animation-delay:.4s;}
+    .b4{ background:#93c5fd; animation-delay:.6s;}
+    @keyframes twinkle{ 0%{filter:brightness(.8)} 50%{filter:brightness(1.7)} 100%{filter:brightness(.9)} }
+
+    .panel{
+      margin-top:14px;
+      background: rgba(255,255,255,.04);
+      border:4px solid var(--border);
+      border-radius: var(--cardRadius);
+      padding:18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .subtitle{
+      margin:0 0 14px;
+      font-size:18px;
+      color:#d7e7ff;
+      text-shadow: 0 2px 0 rgba(0,0,0,.35);
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:12px;
+      align-items:end;
+      margin:10px 0 14px;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    select{
+      width:100%;
+      padding:14px 12px;
+      border-radius: 12px;
+      border:3px solid var(--border);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      outline:none;
+      font-size:14px;
+    }
+
+    .btn{
+      padding:14px 16px;
+      border-radius:14px;
+      border:3px solid var(--btnGreen);
+      background: linear-gradient(180deg, var(--btnRed1) 0%, var(--btnRed2) 100%);
+      color:#fffaf0;
+      cursor:pointer;
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,.15),
+        0 8px 0 #7a0f24,
+        0 10px 18px rgba(0,0,0,.45);
+      letter-spacing:2px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .btn:active{
+      transform: translateY(4px);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,.15),
+        0 4px 0 #7a0f24,
+        0 6px 10px rgba(0,0,0,.5);
+    }
+
+    /* content area */
+    .content{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+      margin-top:10px;
+    }
+
+    .media{
+      background: rgba(255,255,255,.05);
+      border:4px solid var(--border);
+      border-radius: 16px;
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .media h3{
+      margin:0 0 10px;
+      font-size:14px;
+      color:#cfe3ff;
+      text-shadow: 0 2px 0 rgba(0,0,0,.35);
+    }
+
+    audio{ width:100%; }
+
+    /* ===== snow overlay (dense + sides) ===== */
+    .snow-layer{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:3;
+      overflow:hidden;
+    }
+    .flake{
+      position:absolute;
+      top:-14px;
+      width:6px;height:6px;
+      border-radius:2px;
+      background: rgba(230,241,255,.92);
+      animation: fall linear infinite;
+      opacity:.9;
+    }
+    .flake.big{ width:10px;height:10px; opacity:.55; }
+    @keyframes fall{
+      to{ transform: translateY(112vh); opacity:.16; }
+    }
+
+    /* ===== pixel art blocks ===== */
+    .art-wrap{
+      display:flex;
+      justify-content:center;
+      padding:8px 0 0;
+    }
+    .pixel{
+      width: 18px;
+      height: 18px;
+      background: transparent;
+      image-rendering: pixelated;
+      transform: scale(1);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
+
+    /* cake pixel art (box-shadow) */
+    .cake{
+      background:#0000;
+      box-shadow:
+        /* plate */
+        0 11px 0 0 rgba(0,0,0,0),
+        -6px 12px 0 0 #cbd5e1, -5px 12px 0 0 #cbd5e1, -4px 12px 0 0 #cbd5e1, -3px 12px 0 0 #cbd5e1, -2px 12px 0 0 #cbd5e1, -1px 12px 0 0 #cbd5e1,
+         0px 12px 0 0 #cbd5e1,  1px 12px 0 0 #cbd5e1,  2px 12px 0 0 #cbd5e1,  3px 12px 0 0 #cbd5e1,  4px 12px 0 0 #cbd5e1,  5px 12px 0 0 #cbd5e1,  6px 12px 0 0 #cbd5e1,
+
+        /* cake base */
+        -4px 9px 0 0 #f59e0b, -3px 9px 0 0 #f59e0b, -2px 9px 0 0 #f59e0b, -1px 9px 0 0 #f59e0b,
+         0px 9px 0 0 #f59e0b,  1px 9px 0 0 #f59e0b,  2px 9px 0 0 #f59e0b,  3px 9px 0 0 #f59e0b, 4px 9px 0 0 #f59e0b,
+
+        -4px 8px 0 0 #fbbf24, -3px 8px 0 0 #fbbf24, -2px 8px 0 0 #fbbf24, -1px 8px 0 0 #fbbf24,
+         0px 8px 0 0 #fbbf24,  1px 8px 0 0 #fbbf24,  2px 8px 0 0 #fbbf24,  3px 8px 0 0 #fbbf24, 4px 8px 0 0 #fbbf24,
+
+        /* frosting */
+        -4px 7px 0 0 #fff7ed, -3px 7px 0 0 #fff7ed, -2px 7px 0 0 #fff7ed, -1px 7px 0 0 #fff7ed,
+         0px 7px 0 0 #fff7ed,  1px 7px 0 0 #fff7ed,  2px 7px 0 0 #fff7ed,  3px 7px 0 0 #fff7ed, 4px 7px 0 0 #fff7ed,
+
+        -3px 6px 0 0 #fecdd3, -2px 6px 0 0 #fecdd3, -1px 6px 0 0 #fecdd3, 0px 6px 0 0 #fecdd3, 1px 6px 0 0 #fecdd3, 2px 6px 0 0 #fecdd3, 3px 6px 0 0 #fecdd3,
+
+        /* candle */
+        0px 4px 0 0 #60a5fa,
+        0px 3px 0 0 #60a5fa,
+        0px 2px 0 0 #60a5fa,
+        0px 1px 0 0 #f97316;
+    }
+
+    /* tree pixel art */
+    .tree{
+      box-shadow:
+        /* trunk */
+        0px 12px 0 0 #92400e,
+        0px 11px 0 0 #b45309,
+        /* leaves */
+        0px 3px 0 0 #14532d,
+        -1px 4px 0 0 #166534, 0px 4px 0 0 #166534, 1px 4px 0 0 #166534,
+        -2px 5px 0 0 #15803d, -1px 5px 0 0 #15803d, 0px 5px 0 0 #15803d, 1px 5px 0 0 #15803d, 2px 5px 0 0 #15803d,
+        -3px 6px 0 0 #16a34a, -2px 6px 0 0 #16a34a, -1px 6px 0 0 #16a34a, 0px 6px 0 0 #16a34a, 1px 6px 0 0 #16a34a, 2px 6px 0 0 #16a34a, 3px 6px 0 0 #16a34a,
+        -2px 7px 0 0 #22c55e, -1px 7px 0 0 #22c55e, 0px 7px 0 0 #22c55e, 1px 7px 0 0 #22c55e, 2px 7px 0 0 #22c55e,
+        -1px 8px 0 0 #16a34a, 0px 8px 0 0 #16a34a, 1px 8px 0 0 #16a34a,
+
+        /* ornaments */
+        -1px 6px 0 0 #ef4444,
+        2px 6px 0 0 #f59e0b,
+        0px 7px 0 0 #60a5fa,
+
+        /* star */
+        0px 2px 0 0 #fde047;
+    }
+
+    /* Dec.24 "animation" block */
+    .anim24{
+      width:min(560px, 92%);
+      height:280px;
+      border-radius:16px;
+      border:4px solid var(--border);
+      background: rgba(15,23,42,.55);
+      position:relative;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .anim24 .row{
+      position:absolute; left:18px; right:18px; top:18px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .anim24 .px{
+      width:12px; height:12px; border-radius:2px;
+      background:#93c5fd;
+      animation: tw24 1.2s steps(2,end) infinite;
+      opacity:.95;
+    }
+    .anim24 .px:nth-child(4n+1){ background:#ff6b6b; }
+    .anim24 .px:nth-child(4n+2){ background:#ffe58a; }
+    .anim24 .px:nth-child(4n+3){ background:#a7f3d0; }
+    .anim24 .px:nth-child(7n){ animation-delay:.3s; }
+    .anim24 .px:nth-child(9n){ animation-delay:.6s; }
+    @keyframes tw24{ 0%{filter:brightness(.7)} 50%{filter:brightness(1.8)} 100%{filter:brightness(.9)} }
+
+    .anim24 .msg{
+      position:absolute; left:0; right:0; top:92px;
+      text-align:center;
+      font-size:18px;
+      color:var(--headline);
+      text-shadow:
+        -2px 0 var(--headlineStroke),
+         2px 0 var(--headlineStroke),
+         0 -2px var(--headlineStroke),
+         0  2px var(--headlineStroke),
+         0  0 16px var(--headlineGlow);
+      padding:0 12px;
+    }
+    .anim24 .gift{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:28px;
+      width:120px; height:92px;
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      border:4px solid var(--border);
+      border-radius:14px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .anim24 .gift::before{
+      content:"";
+      position:absolute; left:50%; top:0; bottom:0;
+      width:18px;
+      transform:translateX(-50%);
+      background: rgba(196,30,58,.85);
+      animation: ribbon 1.2s ease-in-out infinite;
+    }
+    .anim24 .gift::after{
+      content:"";
+      position:absolute; left:0; right:0; top:36px;
+      height:18px;
+      background: rgba(47,125,50,.80);
+      animation: ribbon2 1.2s ease-in-out infinite;
+    }
+    @keyframes ribbon{ 0%,100%{filter:brightness(.9)} 50%{filter:brightness(1.25)} }
+    @keyframes ribbon2{ 0%,100%{filter:brightness(.85)} 50%{filter:brightness(1.3)} }
+
+    .hidden{ display:none !important; }
+    .hint{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.6;
+      margin-top:10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sparkles"></div>
+  <div class="pixel-trees">
+    <div class="far"></div>
+    <div class="near"></div>
+  </div>
+  <div class="snow-ground"></div>
+
+  <div class="snow-layer" id="snow"></div>
+
+  <div class="wrap">
+    <div class="big-title">Daily Special For Wuuu</div>
+
+    <div class="pixel-card">
+      <div class="badge">16-bit Cozy • Snowy Night</div>
+      <div class="lights">
+        <span class="bulb b1"></span><span class="bulb b2"></span><span class="bulb b3"></span><span class="bulb b4"></span>
+        <span class="bulb b2"></span><span class="bulb b3"></span><span class="bulb b4"></span><span class="bulb b1"></span>
+        <span class="bulb b3"></span><span class="bulb b2"></span><span class="bulb b4"></span><span class="bulb b1"></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <!-- OPEN 前副標題 -->
+      <h2 class="subtitle" id="subtitle">🎄 Select Ur Date</h2>
+
+      <div class="controls">
+        <div>
+          <label for="datePick">DATE</label>
+          <select id="datePick">
+            <option value="Dec.23" selected>Dec.23</option>
+            <option value="Dec.24">Dec.24</option>
+            <option value="Dec.25">Dec.25</option>
+          </select>
+        </div>
+        <button class="btn" id="openBtn">🎁 OPEN</button>
+      </div>
+
+      <div class="content">
+        <div class="media">
+          <h3>♪ BGM</h3>
+          <audio id="bgm" controls preload="auto"></audio>
+          <div class="hint">
+            把你的音樂放進 repo：<b>assets/Dec23.wav</b> / <b>assets/Dec24.wav</b> / <b>assets/Dec25.wav</b><br>
+            （GitHub Pages 才能讓別人也聽到）
+          </div>
+        </div>
+
+        <div class="media">
+          <h3 id="visualTitle">PIXEL VISUAL</h3>
+
+          <!-- Dec.23: cake -->
+          <div class="art-wrap hidden" id="cakeWrap">
+            <div class="pixel cake" aria-label="pixel cake"></div>
+          </div>
+
+          <!-- Dec.24: simple pixel animation -->
+          <div class="hidden" id="animWrap">
+            <div class="anim24">
+              <div class="row" id="twinkleRow"></div>
+              <div class="msg">🕯️ Merry Christmas</div>
+              <div class="gift"></div>
+            </div>
+          </div>
+
+          <!-- Dec.25: tree -->
+          <div class="art-wrap hidden" id="treeWrap">
+            <div class="pixel tree" aria-label="pixel tree"></div>
+          </div>
+
+          <div class="hint" id="visualHint"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Dense snow (center + sides)
+    // ----------------------------
+    (function makeSnow(){
+      const snow = document.getElementById("snow");
+      const N_CENTER = 140; // 密集
+      const N_SIDE = 90;    // 兩側也密集
+
+      function addFlake(leftPct){
+        const f = document.createElement("div");
+        const big = Math.random() < 0.20;
+        f.className = "flake" + (big ? " big" : "");
+        const size = big ? 10 : [4,5,6,7][Math.floor(Math.random()*4)];
+        const dur = (big ? rand(4.0, 8.0) : rand(3.0, 7.0)).toFixed(2);
+        const delay = rand(0, 2.0).toFixed(2);
+        f.style.left = leftPct + "%";
+        f.style.width = size + "px";
+        f.style.height = size + "px";
+        f.style.animationDuration = dur + "s";
+        f.style.animationDelay = delay + "s";
+        snow.appendChild(f);
+      }
+
+      function rand(a,b){ return a + Math.random()*(b-a); }
+
+      // center
+      for(let i=0;i<N_CENTER;i++){
+        addFlake(Math.floor(rand(6, 94)));
+      }
+      // left side curtain
+      for(let i=0;i<N_SIDE;i++){
+        addFlake(Math.floor(rand(0, 12)));
+      }
+      // right side curtain
+      for(let i=0;i<N_SIDE;i++){
+        addFlake(Math.floor(rand(88, 100)));
+      }
+    })();
+
+    // ----------------------------
+    // Dec.24 top twinkle row
+    // ----------------------------
+    (function buildTwinkleRow(){
+      const row = document.getElementById("twinkleRow");
+      for(let i=0;i<60;i++){
+        const s = document.createElement("span");
+        s.className = "px";
+        row.appendChild(s);
+      }
+    })();
+
+    // ----------------------------
+    // Date logic: titles + wav path + visuals
+    // ----------------------------
+    const subtitle = document.getElementById("subtitle");
+    const visualTitle = document.getElementById("visualTitle");
+    const visualHint = document.getElementById("visualHint");
+
+    const datePick = document.getElementById("datePick");
+    const openBtn  = document.getElementById("openBtn");
+    const bgm      = document.getElementById("bgm");
+
+    const cakeWrap = document.getElementById("cakeWrap");
+    const animWrap = document.getElementById("animWrap");
+    const treeWrap = document.getElementById("treeWrap");
+
+    function hideAll(){
+      cakeWrap.classList.add("hidden");
+      animWrap.classList.add("hidden");
+      treeWrap.classList.add("hidden");
+    }
+
+    function setBgm(path){
+      // reset audio to force reload
+      bgm.pause();
+      bgm.src = path;
+      bgm.load();
+      // try autoplay (mobile可能會被擋，對方點 play 即可)
+      bgm.play().catch(()=>{});
+    }
+
+    function renderForDate(v){
+      // OPEN 後才切換標題（你要的）
+      if(v === "Dec.23"){
+        subtitle.textContent = "🎂 Happy Birthday To Wuuu";
+        visualTitle.textContent = "PIXEL BIRTHDAY CAKE (Dec.23)";
+        visualHint.textContent = "（生日蛋糕是靜態像素圖）";
+        hideAll(); cakeWrap.classList.remove("hidden");
+        setBgm("assets/Dec23.wav");
+      }else if(v === "Dec.24"){
+        subtitle.textContent = "🕯️ Merry Christmas";
+        visualTitle.textContent = "PIXEL TWINKLE SCENE (Dec.24)";
+        visualHint.textContent = "（用像素閃燈 + 飄雪當作小動畫氛圍）";
+        hideAll(); animWrap.classList.remove("hidden");
+        setBgm("assets/Dec24.wav");
+      }else{
+        subtitle.textContent = "🎄 Merry Christmas";
+        visualTitle.textContent = "PIXEL CHRISTMAS TREE (Dec.25)";
+        visualHint.textContent = "（聖誕樹是靜態像素圖）";
+        hideAll(); treeWrap.classList.remove("hidden");
+        setBgm("assets/Dec25.wav");
+      }
+    }
+
+    // initial (OPEN 前不切標題、不播)
+    hideAll();
+
+    openBtn.addEventListener("click", () => {
+      renderForDate(datePick.value);
+    });
+  </script>
+</body>
+</html>
